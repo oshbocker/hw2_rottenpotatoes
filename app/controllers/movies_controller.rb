@@ -10,12 +10,20 @@ class MoviesController < ApplicationController
     @ratingsHash = Hash.new()
     @all_ratings = Movie.all_ratings
     if params[:ratings].nil?
-      @ratings = @all_ratings
+      if session.has_key?(:ratings)
+        redirect_to movies_path(ratings: session[:ratings],sort: session[:sort])
+        @ratings = session[:ratings]
+        @sort = session[:sort]
+      else
+        @ratings = @all_ratings
+      end
     else
       @ratings = params[:ratings].keys
+      session[:ratings] = params[:ratings]
+      @sort = params[:sort]
+      session[:sort] = params[:sort]
     end
     @ratings.each { |x| @ratingsHash[x]=1 }
-    @sort = params[:sort]
     @movies = Movie.where(rating: @ratings).order(@sort)
   end
 
